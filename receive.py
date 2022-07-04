@@ -19,10 +19,10 @@ data_ser.flushInput()
 time_start = 0;
 time_end = 0;
 total_time = 0;
-startCountFlag = 0;
 totalCountNum = 0;
 
 def get_data():
+    startCountFlag = 0;
     while True:
         data_count = data_ser.inWaiting()
         if data_count !=0 :
@@ -40,17 +40,18 @@ def get_data():
                 with open("log.txt", "a") as f:
                     f.write(str(time_start) + " " + str(time_end) + " " + str(total_time) + "\n");
                 startCountFlag = 0;
-            startCountFunc(recv);    
+            startCountFunc(recv,startCountFlag);    
         time.sleep(0.1)
 
-def startCountFunc(data):
+def startCountFunc(data,startCountFlag):
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
-    if(startCountFlag == '1'):
-        totalCountNum = totalCountNum + 1;
-        # 将脉冲数写入日志:
-        with open("log.txt", "a") as f:
-            f.write("接收到 " + str(totalCountNum) + " 第个脉冲 | " + "当前经过时间: " + str(time.time() - time_start) + "\n");
-    elif(startCountFlag == '0'):
+    if(startCountFlag == 1):
+        if(data == '1'):
+            totalCountNum = totalCountNum + 1;
+            # 将脉冲数写入日志:
+            with open("log.txt", "a") as f:
+                f.write("接收到 " + str(totalCountNum) + " 第个脉冲 | " + "当前经过时间: " + str(time.time() - time_start) + "\n");
+    elif(startCountFlag == 0):
         print("totalCountNum: ", totalCountNum);
         totalCountNum = 0;
 
