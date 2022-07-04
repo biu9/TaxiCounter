@@ -9,6 +9,7 @@ import time
 # 2. 接收到start标志后开始记录串口数据
 # 3. 接收到stop标志后结束记录串口数据
 # 4. 由于接收到一次信号代表着经过一圈,需要计算总路程&时间&费用
+# 5. 按下切换计费模式
 # bouns:
 # 1. 将路程-时间图在一次结束后打印出来
 # 2. 保存每一次的费用时间速度等信息
@@ -25,6 +26,7 @@ def get_data():
     global time_end;
     global total_time;
     global totalCountNum;
+    countFeeMode = 0;
     time_start = 0;
     time_end = 0;
     while True:
@@ -45,21 +47,36 @@ def get_data():
                 with open("log.txt", "a") as f:
                     f.write(str(time_start) + "-----" + str(time_end) + "------" + str(total_time) + "\n");
                 startCountFlag = 0;
-            startCountFunc(recv,startCountFlag);    
+            if(recv == "day"):
+                countFeeMode = 0;
+            elif(recv == "night"):
+                countFeeMode = 1;
+            startCountFunc(recv,startCountFlag,countFeeMode);    
         time.sleep(0.1)
 
-def startCountFunc(data,startCountFlag):
+def startCountFunc(data,startCountFlag,countMode):
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
     global totalCountNum;
     if(startCountFlag == 1):
         if(data == '1'):
-            totalCountNum = totalCountNum + 1;
+            totalCountNum = totalCountNum + 1;    
+            totalFee = countFee(totalCountNum,countMode);
+            print("totalFee: ", str(totalFee));
             # 将脉冲数写入日志:
             with open("log.txt", "a") as f:
-                f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start) + "\n");
+                f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start)+ " | total fee now: " + str(totalFee) +"\n");
     elif(startCountFlag == 0):
         print("totalCountNum: ", str(totalCountNum));
         totalCountNum = 0;
+
+
+def countFee(totalCountNum,countMode):
+    # 白天模式
+    if(countMode == 0):
+        return totalCountNum * 1
+    # 夜间模式
+    elif(countMode == 1):
+        return totalCountNum * 2
 
 if __name__ == '__main__':
     
