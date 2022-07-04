@@ -16,43 +16,49 @@ import time
 data_ser = serial.Serial("COM4",9600,timeout = 5)
 data_ser.flushInput()
 
-time_start = 0;
-time_end = 0;
-total_time = 0;
+global totalCountNum;
 totalCountNum = 0;
 
 def get_data():
     startCountFlag = 0;
+    global time_start;
+    global time_end;
+    global total_time;
+    global totalCountNum;
+    time_start = 0;
+    time_end = 0;
     while True:
         data_count = data_ser.inWaiting()
         if data_count !=0 :
             #recv = data_ser.read(data_ser.in_waiting).decode("gbk")
             recv = data_ser.read(data_ser.in_waiting).decode("gbk")
             print(time.time()," ---  data_recv  --> ", recv)
-            if(recv == 'start'):
+            if(recv == 'start count'):
                 time_start = time.time();
                 startCountFlag = 1;
-            elif(recv == 'end'):
+            elif(recv == "403" and startCountFlag == 1):
+                print("stop count");
                 time_end = time.time();
                 total_time = time_end - time_start;
                 print("time_start: ", time_start, "time_end: ", time_end, "total_time: ", total_time);
                 # 将时间写入日志:
                 with open("log.txt", "a") as f:
-                    f.write(str(time_start) + " " + str(time_end) + " " + str(total_time) + "\n");
+                    f.write(str(time_start) + "-----" + str(time_end) + "------" + str(total_time) + "\n");
                 startCountFlag = 0;
             startCountFunc(recv,startCountFlag);    
         time.sleep(0.1)
 
 def startCountFunc(data,startCountFlag):
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
+    global totalCountNum;
     if(startCountFlag == 1):
         if(data == '1'):
             totalCountNum = totalCountNum + 1;
             # 将脉冲数写入日志:
             with open("log.txt", "a") as f:
-                f.write("接收到 " + str(totalCountNum) + " 第个脉冲 | " + "当前经过时间: " + str(time.time() - time_start) + "\n");
+                f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start) + "\n");
     elif(startCountFlag == 0):
-        print("totalCountNum: ", totalCountNum);
+        print("totalCountNum: ", str(totalCountNum));
         totalCountNum = 0;
 
 if __name__ == '__main__':
