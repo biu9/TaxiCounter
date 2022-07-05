@@ -18,6 +18,7 @@ data_ser = serial.Serial("COM4",9600,timeout = 5)
 data_ser.flushInput()
 
 global totalCountNum;
+global lastReceiveSignal;
 totalCountNum = 0;
 
 def get_data():
@@ -57,20 +58,34 @@ def get_data():
 def startCountFunc(data,startCountFlag,countMode):
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
     global totalCountNum;
+    global lastReceiveSignal;
+    lastReceiveSignal = 0;
+    totalFee = 0;
     if(startCountFlag == 1):
         if(data == '1'):
-            totalCountNum = totalCountNum + 1;    
+            lastReceiveSignal = time.time();
+            totalCountNum = totalCountNum + 1;
+        print("time.time(): ", time.time(), " | lastReceiveSignal: ", lastReceiveSignal);
+        if(time.time() - lastReceiveSignal > 1):     
+            totalFee = countFee(totalCountNum,3);
+        else:
             totalFee = countFee(totalCountNum,countMode);
-            print("totalFee: ", str(totalFee));
-            # 将脉冲数写入日志:
-            with open("log.txt", "a") as f:
-                f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start)+ " | total fee now: " + str(totalFee) +"\n");
+
+        print("totalFee: ", str(totalFee));
+        # 将脉冲数写入日志:
+        with open("log.txt", "a") as f:
+            f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start)+ " | total fee now: " + str(totalFee) +"\n");
     elif(startCountFlag == 0):
-        print("totalCountNum: ", str(totalCountNum));
+        print("startCountFlag = 0, totalCountNum: ", str(totalCountNum));
         totalCountNum = 0;
 
 
 def countFee(totalCountNum,countMode):
+    # 计算是否进入等待模式
+    if(countMode == 3):
+        # 等待模式
+        print('waiting mode...');
+        return totalCountNum * 0.5;
     # 白天模式
     if(countMode == 0):
         return totalCountNum * 1
