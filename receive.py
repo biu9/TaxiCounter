@@ -20,6 +20,11 @@ data_ser.flushInput()
 global totalCountNum;
 global lastReceiveSignal;
 totalCountNum = 0;
+# 时间以及路程数组
+global timeArray;
+global lenArray;
+timeArray = [];
+lenArray = [];
 
 def get_data():
     startCountFlag = 0;
@@ -27,6 +32,7 @@ def get_data():
     global time_end;
     global total_time;
     global totalCountNum;
+
     countFeeMode = 0;
     time_start = 0;
     time_end = 0;
@@ -56,6 +62,8 @@ def get_data():
         time.sleep(0.1)
 
 def startCountFunc(data,startCountFlag,countMode):
+    global timeArray;
+    global lenArray;
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
     global totalCountNum;
     global lastReceiveSignal;
@@ -72,13 +80,23 @@ def startCountFunc(data,startCountFlag,countMode):
             totalFee = countFee(totalCountNum,countMode);
 
         print("totalFee: ", str(totalFee));
+        # 将路程-时间图在一次结束后打印出来
+        timeArray.append(time.time() - time_start);
+        lenArray.append(totalCountNum);
         # 将脉冲数写入日志:
         with open("log.txt", "a") as f:
             f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start)+ " | total fee now: " + str(totalFee) +"\n");
     elif(startCountFlag == 0):
         print("startCountFlag = 0, totalCountNum: ", str(totalCountNum));
+        if(len(timeArray) != 0 and len(lenArray) != 0):        
+            print("timeArray: ", timeArray, "lenArray: ", lenArray);
+            with open("log.txt", "a") as f:
+                f.write("timeArray: " + str(timeArray) + "\n lenArray: " + str(lenArray) + "\n");
+            timeArray = [];
+            lenArray = [];
         totalCountNum = 0;
 
+    
 
 def countFee(totalCountNum,countMode):
     # 计算是否进入等待模式
@@ -101,7 +119,13 @@ if __name__ == '__main__':
         print("loop")
         time.sleep(1)  
         #print("send 1")
-        #data_ser.write(b'1')  # 发送二进制1
+        data_ser.write(b'2')  # 发送二进制1
+        time.sleep(1)  
+        data_ser.write(b'3') 
+        time.sleep(1)  
+        data_ser.write(b'5') 
+        time.sleep(1)  
+        data_ser.write(b'7') 
         time.sleep(1)
         #print("send 0")
         #data_ser.write(b'0') # 发送二进制0

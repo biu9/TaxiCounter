@@ -1,0 +1,60 @@
+receive 0 signal | time now: 0.0009062290191650391 | total fee now: 0.0
+receive 0 signal | time now: 0.2971053123474121 | total fee now: 0.0
+receive 0 signal | time now: 0.5130717754364014 | total fee now: 0.0
+1657007466.9132133-----1657007467.6431863------0.7299730777740479
+timeArray: [0.0, 0.29378271102905273, 0.5120494365692139]
+ lenArray: [0, 0, 0]
+receive 0 signal | time now: 0.0010068416595458984 | total fee now: 0.0
+receive 0 signal | time now: 0.21909332275390625 | total fee now: 0.0
+receive 0 signal | time now: 0.43579864501953125 | total fee now: 0.0
+receive 0 signal | time now: 0.7629513740539551 | total fee now: 0.0
+receive 0 signal | time now: 0.9791748523712158 | total fee now: 0.0
+receive 0 signal | time now: 0.0 | total fee now: 0.0
+receive 0 signal | time now: 0.21616554260253906 | total fee now: 0.0
+receive 0 signal | time now: 0.43225693702697754 | total fee now: 0.0
+receive 0 signal | time now: 0.0 | total fee now: 0.0
+receive 0 signal | time now: 0.3266904354095459 | total fee now: 0.0
+receive 0 signal | time now: 0.5463922023773193 | total fee now: 0.0
+receive 0 signal | time now: 0.7639951705932617 | total fee now: 0.0
+receive 0 signal | time now: 1.0933644771575928 | total fee now: 0.0
+1657011215.8403957-----1657011217.1510556------1.3106598854064941
+timeArray: [0.0, 0.21909332275390625, 0.43579864501953125, 0.7629513740539551, 0.9791748523712158, 0.0, 0.21616554260253906, 0.43225693702697754, 0.0, 0.3266904354095459, 0.5463922023773193, 0.7639951705932617, 1.0924568176269531]
+ lenArray: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+receive 0 signal | time now: 0.0 | total fee now: 0.0
+receive 0 signal | time now: 0.18608999252319336 | total fee now: 0.0
+receive 0 signal | time now: 0.4055900573730469 | total fee now: 0.0
+receive 0 signal | time now: 0.6212995052337646 | total fee now: 0.0
+receive 0 signal | time now: 0.9490218162536621 | total fee now: 0.0
+receive 0 signal | time now: 0.0 | total fee now: 0.0
+receive 0 signal | time now: 0.3272557258605957 | total fee now: 0.0
+receive 0 signal | time now: 0.5468990802764893 | total fee now: 0.0
+receive 0 signal | time now: 0.7641003131866455 | total fee now: 0.0
+receive 0 signal | time now: 0.9826240539550781 | total fee now: 0.0
+receive 0 signal | time now: 1.3105175495147705 | total fee now: 0.0
+receive 0 signal | time now: 1.5281920433044434 | total fee now: 0.0
+receive 0 signal | time now: 1.7452490329742432 | total fee now: 0.0
+receive 0 signal | time now: 2.070180654525757 | total fee now: 0.0
+receive 0 signal | time now: 2.2880825996398926 | total fee now: 0.0
+receive 0 signal | time now: 2.5075623989105225 | total fee now: 0.0
+receive 0 signal | time now: 2.726867437362671 | total fee now: 0.0
+receive 0 signal | time now: 3.053093671798706 | total fee now: 0.0
+receive 0 signal | time now: 3.2709126472473145 | total fee now: 0.0
+receive 0 signal | time now: 3.603073835372925 | total fee now: 0.0
+receive 0 signal | time now: 3.8214921951293945 | total fee now: 0.0
+receive 0 signal | time now: 4.040111780166626 | total fee now: 0.0
+receive 0 signal | time now: 4.2572290897369385 | total fee now: 0.0
+receive 0 signal | time now: 4.5859997272491455 | total fee now: 0.0
+receive 0 signal | time now: 0.0 | total fee now: 0.0
+receive 0 signal | time now: 0.2178478240966797 | total fee now: 0.0
+receive 0 signal | time now: 0.5442290306091309 | total fee now: 0.0
+receive 0 signal | time now: 0.7605917453765869 | total fee now: 0.0
+receive 0 signal | time now: 0.9767367839813232 | total fee now: 0.0
+receive 0 signal | time now: 1.306321382522583 | total fee now: 0.0
+receive 0 signal | time now: 1.5244102478027344 | total fee now: 0.0
+receive 0 signal | time now: 1.7447099685668945 | total fee now: 0.0
+receive 0 signal | time now: 1.9633119106292725 | total fee now: 0.0
+receive 0 signal | time now: 2.2916009426116943 | total fee now: 0.0
+receive 0 signal | time now: 2.5106701850891113 | total fee now: 0.0
+receive 0 signal | time now: 2.729515314102173 | total fee now: 0.0
+receive 0 signal | time now: 3.0581018924713135 | total fee now: 0.0
+receive 0 signal | time now: 3.2784230709075928 | total fee now: 0.0
