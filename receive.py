@@ -2,6 +2,7 @@ import serial
 import time
 import _thread   # 导入线程包
 import time
+import matplotlib.pyplot as plt
 
 # goal: 接收串口数据并打印
 # feature: 
@@ -27,6 +28,9 @@ lenArray = [];
 # count fee
 global totalFee
 global countMode
+#一圈的路程
+global lenPerSignal;
+lenPerSignal = 1;
 
 def get_data():
     startCountFlag = 0;
@@ -86,6 +90,7 @@ def startCountFunc(data,startCountFlag,countMode):
             print("timeArray: ", timeArray, "lenArray: ", lenArray);
             with open("log.txt", "a") as f:
                 f.write("timeArray: " + str(timeArray) + "\n lenArray: " + str(lenArray) + "\n");
+            drawTimeAndLen(timeArray,lenArray);
             timeArray = [];
             lenArray = [];
         totalCountNum = 0;
@@ -94,29 +99,20 @@ def startCountFunc(data,startCountFlag,countMode):
 # 正常模式:按照lenArray中的1的个数 * countModel计费
 def countFee(timeArray,lenArray,countModel):
     fee = 0
+    global lenPerSignal;
     for i in range(len(timeArray)-2):
         if lenArray[i] == 0:
             if lenArray[i+1] == 0 and lenArray[i+2] == 0:
                 fee += ((timeArray[i+2]-timeArray[i]) * 0.5)
                 i += 2
         else:
-            fee += lenArray[i] * (countModel+1)
+            fee += lenArray[i] * (countModel+1) * lenPerSignal
     print("fee in function: ", fee);
     return int(fee)
 
 # 将收到的数以00开头发送出去,
 # 发送的数据为4位数据,不足4位前补0
 def pubFee(totalPrice):
-#    time.sleep(1)
-#    data_ser.write(b'2')  # 发送二进制1
-#    time.sleep(1)  
-#    data_ser.write(b'3') 
-#    time.sleep(1)  
-#    data_ser.write(b'5') 
-#    time.sleep(1)  
-#    data_ser.write(b'7') 
-#    time.sleep(1)  
-#    data_ser.write(b'0') 
     priceStr = str(totalPrice)
     if len(priceStr) < 4:
         priceStr = '0' * (4 - len(priceStr)) + priceStr
@@ -127,7 +123,16 @@ def pubFee(totalPrice):
     time.sleep(5);
     data_ser.write(b'0');
     
-
+# 画出速度与时间关系图
+def drawTimeAndLen(timeArray,lenArray):
+    global lenPerSignal
+    vArray = [];
+    tArray = [];
+    for i in range(len(timeArray)-1): 
+        vArray.append((lenArray[i+1]-lenArray[i])*lenPerSignal/(timeArray[i+1]-timeArray[i]));
+        tArray.append(timeArray[i]);
+    plt.plot(tArray,vArray);
+    plt.savefig("timeAndLen.png");
 if __name__ == '__main__':
     
     _thread.start_new_thread(get_data,())  # 开启线程，执行get_data方法
