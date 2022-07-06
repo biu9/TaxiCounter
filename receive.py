@@ -89,7 +89,7 @@ def startCountFunc(data,startCountFlag,countMode):
         if(len(timeArray) != 0 and len(lenArray) != 0):        
             print("timeArray: ", timeArray, "lenArray: ", lenArray);
             with open("log.txt", "a") as f:
-                f.write("timeArray: " + str(timeArray) + "\n lenArray: " + str(lenArray) + "\n");
+                f.write("timeArray: " + str(timeArray) + "\nlenArray: " + str(lenArray) + "\n" + "======================================\n");
             drawTimeAndLen(timeArray,lenArray);
             timeArray = [];
             lenArray = [];
