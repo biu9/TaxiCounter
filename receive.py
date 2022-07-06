@@ -18,13 +18,15 @@ data_ser = serial.Serial("COM4",9600,timeout = 5)
 data_ser.flushInput()
 
 global totalCountNum;
-global lastReceiveSignal;
 totalCountNum = 0;
 # 时间以及路程数组
 global timeArray;
 global lenArray;
 timeArray = [];
 lenArray = [];
+# count fee
+global totalFee
+global countMode
 
 def get_data():
     startCountFlag = 0;
@@ -32,8 +34,9 @@ def get_data():
     global time_end;
     global total_time;
     global totalCountNum;
+    global totalFee;
+    global countMode;
 
-    countFeeMode = 0;
     time_start = 0;
     time_end = 0;
     while True:
@@ -55,10 +58,10 @@ def get_data():
                     f.write(str(time_start) + "-----" + str(time_end) + "------" + str(total_time) + "\n");
                 startCountFlag = 0;
             if(recv == "day"):
-                countFeeMode = 0;
+                countMode = 0;
             elif(recv == "night"):
-                countFeeMode = 1;
-            startCountFunc(recv,startCountFlag,countFeeMode);    
+                countMode = 1;
+            startCountFunc(recv,startCountFlag,countMode);    
         time.sleep(0.1)
 
 def startCountFunc(data,startCountFlag,countMode):
@@ -66,23 +69,14 @@ def startCountFunc(data,startCountFlag,countMode):
     global lenArray;
     # 如果startCountFlag为1,则开始记录接收到的脉冲数
     global totalCountNum;
-    global lastReceiveSignal;
-    lastReceiveSignal = 0;
-    totalFee = 0;
     if(startCountFlag == 1):
         if(data == '1'):
-            lastReceiveSignal = time.time();
             totalCountNum = totalCountNum + 1;
-        print("time.time(): ", time.time(), " | lastReceiveSignal: ", lastReceiveSignal);
-        if(time.time() - lastReceiveSignal > 1):     
-            totalFee = countFee(totalCountNum,3);
-        else:
-            totalFee = countFee(totalCountNum,countMode);
 
-        print("totalFee: ", str(totalFee));
         # 将路程-时间图在一次结束后打印出来
         timeArray.append(time.time() - time_start);
         lenArray.append(totalCountNum);
+
         # 将脉冲数写入日志:
         with open("log.txt", "a") as f:
             f.write("receive " + str(totalCountNum) + " signal | " + "time now: " + str(time.time() - time_start)+ " | total fee now: " + str(totalFee) +"\n");
@@ -96,37 +90,67 @@ def startCountFunc(data,startCountFlag,countMode):
             lenArray = [];
         totalCountNum = 0;
 
-    
+# 等待模式:lenArray连续有三个0的时候开始计时,按间隔时间 * 0.5计费
+# 正常模式:按照lenArray中的1的个数 * countModel计费
+def countFee(timeArray,lenArray,countModel):
+    fee = 0
+    for i in range(len(timeArray)-2):
+        if lenArray[i] == 0:
+            if lenArray[i+1] == 0 and lenArray[i+2] == 0:
+                fee += ((timeArray[i+2]-timeArray[i]) * 0.5)
+                i += 2
+        else:
+            fee += lenArray[i] * (countModel+1)
+    print("fee in function: ", fee);
+    return int(fee)
 
-def countFee(totalCountNum,countMode):
-    # 计算是否进入等待模式
-    if(countMode == 3):
-        # 等待模式
-        print('waiting mode...');
-        return totalCountNum * 0.5;
-    # 白天模式
-    if(countMode == 0):
-        return totalCountNum * 1
-    # 夜间模式
-    elif(countMode == 1):
-        return totalCountNum * 2
+# 将收到的数以00开头发送出去,
+# 发送的数据为4位数据,不足4位前补0
+def pubFee(totalPrice):
+#    time.sleep(1)
+#    data_ser.write(b'2')  # 发送二进制1
+#    time.sleep(1)  
+#    data_ser.write(b'3') 
+#    time.sleep(1)  
+#    data_ser.write(b'5') 
+#    time.sleep(1)  
+#    data_ser.write(b'7') 
+#    time.sleep(1)  
+#    data_ser.write(b'0') 
+    priceStr = str(totalPrice)
+    if len(priceStr) < 4:
+        priceStr = '0' * (4 - len(priceStr)) + priceStr
+    # 发送数据
+    for i in range(len(priceStr)):
+        time.sleep(1)
+        data_ser.write(bytes(priceStr[i], 'utf-8'))
+    time.sleep(5);
+    data_ser.write(b'0');
+    
 
 if __name__ == '__main__':
     
     _thread.start_new_thread(get_data,())  # 开启线程，执行get_data方法
     print("start")
+    # count fee
+    countMode = 0;
+    totalFee = 0;
     while 1:
-        print("loop")
+        print("loop | countModel: ", countMode, " | totalFee: ", totalFee);
         time.sleep(1)  
         #print("send 1")
-        data_ser.write(b'2')  # 发送二进制1
-        time.sleep(1)  
-        data_ser.write(b'3') 
-        time.sleep(1)  
-        data_ser.write(b'5') 
-        time.sleep(1)  
-        data_ser.write(b'7') 
-        time.sleep(1)
+        #data_ser.write(b'2')  # 发送二进制1
+        #time.sleep(1)  
+        #data_ser.write(b'3') 
+        #time.sleep(1)  
+        #data_ser.write(b'5') 
+        #time.sleep(1)  
+        #data_ser.write(b'7') 
+        #time.sleep(1)
         #print("send 0")
         #data_ser.write(b'0') # 发送二进制0
+        # 计算费用
+        totalFee = countFee(timeArray,lenArray,countMode);
+        print("totalFee: ", totalFee);
+        pubFee(totalFee);
 
