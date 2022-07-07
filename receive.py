@@ -26,19 +26,18 @@ global lenArray;
 timeArray = [];
 lenArray = [];
 # count fee
-global totalFee
 global countMode
 #一圈的路程
 global lenPerSignal;
 lenPerSignal = 1;
 
 def get_data():
+    global startCountFlag;
     startCountFlag = 0;
     global time_start;
     global time_end;
     global total_time;
     global totalCountNum;
-    global totalFee;
     global countMode;
 
     time_start = 0;
@@ -57,7 +56,7 @@ def get_data():
                 time_end = time.time();
                 total_time = time_end - time_start;
                 print("time_start: ", time_start, "time_end: ", time_end, "total_time: ", total_time);
-                # 将时间写入日志:
+                # 将时间写入日志
                 with open("log.txt", "a") as f:
                     f.write(str(time_start) + "-----" + str(time_end) + "------" + str(total_time) + "\n");
                 startCountFlag = 0;
@@ -65,7 +64,7 @@ def get_data():
                 countMode = 0;
             elif(recv == "night"):
                 countMode = 1;
-            startCountFunc(recv,startCountFlag,countMode);    
+            startCountFunc(recv,startCountFlag,countMode);
         time.sleep(0.1)
 
 def startCountFunc(data,startCountFlag,countMode):
@@ -98,15 +97,17 @@ def startCountFunc(data,startCountFlag,countMode):
 # 等待模式:lenArray连续有三个0的时候开始计时,按间隔时间 * 0.5计费
 # 正常模式:按照lenArray中的1的个数 * countModel计费
 def countFee(timeArray,lenArray,countModel):
-    fee = 0
+    fee = 2
+    if(lenArray[-1] * 0.75 < 2):
+        return 2;
     global lenPerSignal;
     for i in range(len(timeArray)-2):
-        if lenArray[i] == 0:
-            if lenArray[i+1] == 0 and lenArray[i+2] == 0:
+        if lenArray[i] == lenArray[i+1]:
+            if lenArray[i+1] == lenArray[i+2]:
                 fee += ((timeArray[i+2]-timeArray[i]) * 0.5)
                 i += 2
         else:
-            fee += lenArray[i] * (countModel+1) * lenPerSignal
+            fee += (lenArray[i+1] - lenArray[i]) * (countModel+1) * lenPerSignal
     print("fee in function: ", fee);
     return int(fee)
 
@@ -117,11 +118,27 @@ def pubFee(totalPrice):
     if len(priceStr) < 4:
         priceStr = '0' * (4 - len(priceStr)) + priceStr
     # 发送数据
+    print('send: ', priceStr);
     for i in range(len(priceStr)):
-        time.sleep(1)
+        time.sleep(0.5)
         data_ser.write(bytes(priceStr[i], 'utf-8'))
-    time.sleep(5);
-    data_ser.write(b'0');
+   # time.sleep(0.5);
+   # data_ser.write(b'0');
+
+# 将收到的数以0开头发送出去
+# 发送3位数据,不足3位前补0
+def pubLen(totalLen):
+    lenStr = str(totalLen)
+    if len(lenStr) < 3:
+        lenStr = '0' * (3 - len(lenStr)) + lenStr
+    # 发送数据
+    print('send: ', lenStr);
+    for i in range(len(lenStr)):
+        time.sleep(0.5)
+        data_ser.write(bytes(lenStr[i], 'utf-8'))
+    time.sleep(0.5);
+    data_ser.write(b'm');
+
     
 # 画出速度与时间关系图
 def drawTimeAndLen(timeArray,lenArray):
@@ -132,6 +149,10 @@ def drawTimeAndLen(timeArray,lenArray):
         vArray.append((lenArray[i+1]-lenArray[i])*lenPerSignal/(timeArray[i+1]-timeArray[i]));
         tArray.append(timeArray[i]);
     plt.plot(tArray,vArray);
+    # 设置x
+    plt.xlabel('time');
+    # 设置y
+    plt.ylabel('speed');
     plt.savefig("timeAndLen.png");
 if __name__ == '__main__':
     
@@ -139,9 +160,11 @@ if __name__ == '__main__':
     print("start")
     # count fee
     countMode = 0;
-    totalFee = 0;
+    totalFee = 2;
+    global startCountFlag;
+    startCountFlag = 0;
     while 1:
-        print("loop | countModel: ", countMode, " | totalFee: ", totalFee);
+        print("loop | countModel: ", countMode, " | totalFee: ", totalFee, " | startCountFlag: ", startCountFlag);
         time.sleep(1)  
         #print("send 1")
         #data_ser.write(b'2')  # 发送二进制1
@@ -155,7 +178,10 @@ if __name__ == '__main__':
         #print("send 0")
         #data_ser.write(b'0') # 发送二进制0
         # 计算费用
-        totalFee = countFee(timeArray,lenArray,countMode);
-        print("totalFee: ", totalFee);
-        pubFee(totalFee);
+        if(startCountFlag == 1):
+            totalFee = countFee(timeArray,lenArray,countMode);
+            print("totalFee: ", totalFee);
+            pubFee(totalFee);
+            print('total len: ', int(lenArray[-1] * 0.75));
+            pubLen(int(lenArray[-1] * 0.75));
 
